@@ -7,6 +7,10 @@ import struct
 #for delay simulation
 import time
 
+request_search = {
+    "morpheus": "Follow the white rabbit. \U0001f430",
+}
+
 #the methods in this class appear in the order in which processing
 #takes place for a message
 
@@ -94,12 +98,19 @@ class Message:
 
     def _create_response_json_content(self): #creates the response for the client
 
-        query = self.request.get("x") #takes the value passed and saves it
-        query1 = self.request.get("y") #takes the value passed and saves it
-        query2 = self.request.get("z") #takes the value passed and saves it
-        query3 = self.request.get("temp") #takes the value passed and saves it
-        content = {"result": f'The XYZ coordinates are X{query} Y{query1} Z{query2}. The temperature is {query3}'}
+        action = self.request.get("action")
 
+        if action == "search":
+            query = self.request.get("value") #takes the value passed and saves it
+            #query = self.request.get("x") #takes the value passed and saves it
+            #query1 = self.request.get("y") #takes the value passed and saves it
+            #query2 = self.request.get("z") #takes the value passed and saves it
+            #query3 = self.request.get("temp") #takes the value passed and saves it
+            #content = {"result": f'The XYZ coordinates are X{query} Y{query1} Z{query2}. The temperature is {query3}'}
+            answer = request_search.get(query) or f'No match for "{query}".'
+            content = {"result": answer}
+        else:
+            content = {"result": f'Error: invalid action "{action}".'}    
         content_encoding = "utf-8"
         response = {
             "content_bytes": self._json_encode(content, content_encoding),
