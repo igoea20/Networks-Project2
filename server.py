@@ -11,7 +11,7 @@ import libserver
 
 sel = selectors.DefaultSelector()
 
-#to start for me it was python app-server.py "" 65432
+#to start for me it was python server.py "" 65432
 
 #when a client connection is accepted, a message object is created (socket is ready to read)
 def accept_wrapper(sock):
