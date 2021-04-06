@@ -11,16 +11,18 @@ import libserver
 
 sel = selectors.DefaultSelector()
 
+
+
 #to start for me it was python server.py "" 65432
 
 #when a client connection is accepted, a message object is created (socket is ready to read)
-def accept_wrapper(sock):
+def accept_wrapper(sock, dataArray):
     conn, addr = sock.accept()
     print("accepted connection from", addr)
     #blocking is set to false here
     conn.setblocking(False)
     #create a message object
-    message = libserver.Message(sel, conn, addr)
+    message = libserver.Message(sel, conn, addr, dataArray)
     #associate message object with a socket thats monitored for events (set to just read initially)
     sel.register(conn, selectors.EVENT_READ, data=message)
 
@@ -41,6 +43,7 @@ lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 lsock.bind((host, port))
 lsock.listen()
 print("listening on", (host, port))
+dataArray = []
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
 
@@ -52,12 +55,14 @@ try:
         for key, mask in events:
             if key.data is None:
                 #accept the client connection
-                accept_wrapper(key.fileobj)
+                accept_wrapper(key.fileobj, dataArray)
             else:
                 #create a message object
                 message = key.data
                 try:
                     message.process_events(mask)
+                    print("Sent: ", dataArray)
+            #        dataArray.append(message.request)
                 except Exception:
                     print(
                         "main: error: exception for",

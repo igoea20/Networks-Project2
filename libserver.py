@@ -16,7 +16,7 @@ request_search = {
 
 class Message:
     #constructor
-    def __init__(self, selector, sock, addr):
+    def __init__(self, selector, sock, addr, dataArray):
         self.selector = selector
         self.sock = sock
         self.addr = addr
@@ -26,6 +26,7 @@ class Message:
         self.jsonheader = None
         self.request = None
         self.response_created = False
+        self.dataArray = dataArray
 
     def _set_selector_events_mask(self, mode):
         """Set selector to listen for events: mode is 'r', 'w', or 'rw'."""
@@ -100,7 +101,11 @@ class Message:
 
         action = self.request.get("action")
 
-        if action == "search":
+        if action == "store":
+            store_value = self.request.get("value")
+            content = {"result": f'Stored data "{store_value}".'}
+            self.dataArray.append(store_value) #gets whatever was entered as a value in the command line and adds it to dataArray
+        elif action == "search":
             query = self.request.get("value") #takes the value passed and saves it
             #query = self.request.get("x") #takes the value passed and saves it
             #query1 = self.request.get("y") #takes the value passed and saves it
@@ -110,7 +115,7 @@ class Message:
             answer = request_search.get(query) or f'No match for "{query}".'
             content = {"result": answer}
         else:
-            content = {"result": f'Error: invalid action "{action}".'}    
+            content = {"result": f'Error: invalid action "{action}".'}
         content_encoding = "utf-8"
         response = {
             "content_bytes": self._json_encode(content, content_encoding),
