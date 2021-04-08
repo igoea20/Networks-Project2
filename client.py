@@ -11,7 +11,8 @@ import libclient
 
 sel = selectors.DefaultSelector()
 
-#to start client type python client.py 127.0.0.1 65432 status morpheus 1 2 30.1 1, as an example
+#to start client type python client.py 127.0.0.1 65432 store 30 3
+#input should be: host, socket, request, windspeed, windmill
 
 def create_request(action, value, x, y, windspeed, windmill):
     #we are assuming only json text is being sent

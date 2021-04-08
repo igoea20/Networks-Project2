@@ -16,13 +16,13 @@ sel = selectors.DefaultSelector()
 #to start for me it was python server.py "" 65432
 
 #when a client connection is accepted, a message object is created (socket is ready to read)
-def accept_wrapper(sock, dataArray):
+def accept_wrapper(sock, windmillArray):
     conn, addr = sock.accept()
     print("accepted connection from", addr)
     #blocking is set to false here
     conn.setblocking(False)
     #create a message object
-    message = libserver.Message(sel, conn, addr, dataArray)
+    message = libserver.Message(sel, conn, addr, windmillArray)
     #associate message object with a socket thats monitored for events (set to just read initially)
     sel.register(conn, selectors.EVENT_READ, data=message)
 
@@ -43,7 +43,7 @@ lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 lsock.bind((host, port))
 lsock.listen()
 print("listening on", (host, port))
-dataArray = []
+windmillArray = dict([('1', 0), ('2', 0), ('3', 0), ('4', 0), ('5', 0)])    #initialising all speeds to 0
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
 
@@ -55,13 +55,13 @@ try:
         for key, mask in events:
             if key.data is None:
                 #accept the client connection
-                accept_wrapper(key.fileobj, dataArray)
+                accept_wrapper(key.fileobj, windmillArray)
             else:
                 #create a message object
                 message = key.data
                 try:
                     message.process_events(mask)
-                    print("Sent: ", dataArray)
+                    print("Sent: ", windmillArray)
             #        dataArray.append(message.request)
                 except Exception:
                     print(

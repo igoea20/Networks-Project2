@@ -16,7 +16,7 @@ request_search = {
 
 class Message:
     #constructor
-    def __init__(self, selector, sock, addr, dataArray):
+    def __init__(self, selector, sock, addr, windmillArray):
         self.selector = selector
         self.sock = sock
         self.addr = addr
@@ -26,7 +26,7 @@ class Message:
         self.jsonheader = None
         self.request = None
         self.response_created = False
-        self.dataArray = dataArray
+        self.windmillArray = windmillArray  #this is the windmill array
 
     def _set_selector_events_mask(self, mode):
         """Set selector to listen for events: mode is 'r', 'w', or 'rw'."""
@@ -102,9 +102,10 @@ class Message:
         action = self.request.get("action")
 
         if action == "store":
-            store_value = self.request.get("value")
-            content = {"result": f'Stored data "{store_value}".'}
-            self.dataArray.append(store_value) #gets whatever was entered as a value in the command line and adds it to dataArray
+            current = self.request.get("windmill")
+            store_speed = self.request.get("windspeed")
+            content = {"result": f'Stored data "{store_speed}".'}
+            self.windmillArray[current] = store_speed #gets the speed and updates the array with it at this point
         elif action == "status":
             val = self.request.get("value") #takes the value passed and saves it
             query = self.request.get("x") #takes the value passed and saves it
