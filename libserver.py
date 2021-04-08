@@ -105,16 +105,16 @@ class Message:
             store_value = self.request.get("value")
             content = {"result": f'Stored data "{store_value}".'}
             self.dataArray.append(store_value) #gets whatever was entered as a value in the command line and adds it to dataArray
-        elif action == "search":
+        elif action == "status":
             val = self.request.get("value") #takes the value passed and saves it
             query = self.request.get("x") #takes the value passed and saves it
             query1 = self.request.get("y") #takes the value passed and saves it
-            query2 = self.request.get("z") #takes the value passed and saves it
+            query2 = self.request.get("windspeed") #takes the value passed and saves it
             query3 = self.request.get("windmill") #takes the value passed and saves it
             #content = {"result": f'The XYZ coordinates are X{query} Y{query1} Z{query2}. The temperature is {query3}'}
             answer = request_search.get(val) or f'No match for "{query}".'
             #content = {"result": answer}
-            content = {"result": f'Windmill {query3}: The XYZ coordinates are X{query} Y{query1} Z{query2}. Status: {answer}'}
+            content = {"result": f'Windmill {query3}: The XYZ coordinates are X{query} Y{query1}.Windspeed: {query2} km/h. Status: {answer}'}
         else:
             content = {"result": f'Error: invalid action "{action}".'}
         content_encoding = "utf-8"

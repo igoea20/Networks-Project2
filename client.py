@@ -11,14 +11,14 @@ import libclient
 
 sel = selectors.DefaultSelector()
 
-#to start client type python client.py 127.0.0.1 65432 search morpheus 1 2 3 1, as an example
+#to start client type python client.py 127.0.0.1 65432 status morpheus 1 2 30.1 1, as an example
 
-def create_request(action, value, x, y, z, windmill):
+def create_request(action, value, x, y, windspeed, windmill):
     #we are assuming only json text is being sent
     return dict(
             type="text/json",
             encoding="utf-8",
-            content=dict(action=action, value=value,x=x, y=y, z=z, windmill=windmill),
+            content=dict(action=action, value=value,x=x, y=y, windspeed=windspeed, windmill=windmill),
         )
 
 
@@ -38,11 +38,11 @@ def start_connection(host, port, request):
     sel.register(sock, events, data=message)
 
 if len(sys.argv) != 9: #these are read from the command line
-    print("usage:", sys.argv[0], "<host> <port> <action> <value> <x> <y> <z> <windmill>")
+    print("usage:", sys.argv[0], "<host> <port> <action> <value> <x> <y> <windspeed> <windmill>")
     sys.exit(1)
 
 host, port = sys.argv[1], int(sys.argv[2])
-action, value, x, y, z, windmill = sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8]
+action, value, x, y, windspeed, windmill = sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8]
 
 #get the client to repeatedly connect to the server
 try:
@@ -50,7 +50,7 @@ try:
     while True:
         time.sleep(10)
         #dictionary created representing request
-        request = create_request(action, value, x, y, z, windmill)
+        request = create_request(action, value, x, y, windspeed, windmill)
         start_connection(host, port, request)
 
         try:
