@@ -69,8 +69,7 @@ try:
                         f"{message.addr}:\n{traceback.format_exc()}",
                     )
                     message.close()
-
 except KeyboardInterrupt:
-    print("caught keyboard interrupt, exiting")
+        print("caught keyboard interrupt, exiting")
 finally:
     sel.close()
