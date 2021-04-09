@@ -57,7 +57,7 @@ class Message:
         if self._send_buffer:
 
             #simulates the transmission delay with geostationary satellite (server to satellite to client)
-            time.sleep(0.56)
+            time.sleep(0.0)
         #    print("sending", repr(self._send_buffer), "to", self.addr)
             try:
                 # Should be ready to write
@@ -104,18 +104,32 @@ class Message:
         if action == "store":
             current = self.request.get("windmill")
             store_speed = self.request.get("windspeed")
-            content = {"result": f'Stored data "{store_speed}".'}
+            maxspeed = int(store_speed)
+            if maxspeed > 45:
+                query4 = "SHUTDOWN: windspeed too high."
+            else:
+                query4 = "Windspeed OK."
+            content = {"result": f'Stored data "{store_speed}". {query4}.'}
             self.windmillArray[current] = store_speed #gets the speed and updates the array with it at this point
         elif action == "status":
             val = self.request.get("value") #takes the value passed and saves it
             query = self.request.get("x") #takes the value passed and saves it
             query1 = self.request.get("y") #takes the value passed and saves it
+            query5 = self.request.get("vx")
+            query6 = self.request.get("vy")
+            query7 = self.request.get("vz")
             query2 = self.request.get("windspeed") #takes the value passed and saves it
+            maxspeed = int( query2)
             query3 = self.request.get("windmill") #takes the value passed and saves it
+            if maxspeed > 45:
+                query4 = "SHUTDOWN: windspeed too high."
+            else:
+                query4 = "Windspeed OK."
+
             #content = {"result": f'The XYZ coordinates are X{query} Y{query1} Z{query2}. The temperature is {query3}'}
             answer = request_search.get(val) or f'No match for "{query}".'
             #content = {"result": answer}
-            content = {"result": f'Windmill {query3}: The XYZ coordinates are X{query} Y{query1}.Windspeed: {query2} km/h. Status: {answer}'}
+            content = {"result": f'Windmill {query3}: The XYZ coordinates are X{query} Y{query1}.Windspeed: {query2} km/h. {query4} Update turbine bearing: X vector: {query5} Y vector: {query6} Status: {answer}'}
         else:
             content = {"result": f'Error: invalid action "{action}".'}
         content_encoding = "utf-8"

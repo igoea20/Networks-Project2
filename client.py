@@ -14,12 +14,12 @@ sel = selectors.DefaultSelector()
 #to start client type python client.py 127.0.0.1 65432 store 30 3
 #input should be: host, socket, request, windspeed, windmill
 
-def create_request(action, value, x, y, windspeed, windmill):
+def create_request(action, value, x, y, vx, vy, vz, windspeed, windmill):
     #we are assuming only json text is being sent
     return dict(
             type="text/json",
             encoding="utf-8",
-            content=dict(action=action, value=value,x=x, y=y, windspeed=windspeed, windmill=windmill),
+            content=dict(action=action, value=value,x=x, y=y, vx=vx, vy=vy, vz=vz, windspeed=windspeed, windmill=windmill),
         )
 
 
@@ -38,12 +38,12 @@ def start_connection(host, port, request):
     #message object is associated with the socket
     sel.register(sock, events, data=message)
 
-if len(sys.argv) != 9: #these are read from the command line
-    print("usage:", sys.argv[0], "<host> <port> <action> <value> <x> <y> <windspeed> <windmill>")
+if len(sys.argv) != 12: #these are read from the command line
+    print("usage:", sys.argv[0], "<host> <port> <action> <value> <x> <y> <vx> <vy> <vz>  <windspeed> <windmill>")
     sys.exit(1)
 
 host, port = sys.argv[1], int(sys.argv[2])
-action, value, x, y, windspeed, windmill = sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8]
+action, value, x, y, vx, vy, vz, windspeed, windmill = sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8], sys.argv[9], sys.argv[10], sys.argv[11]
 
 #get the client to repeatedly connect to the server
 try:
@@ -51,7 +51,7 @@ try:
     while True:
         time.sleep(10)
         #dictionary created representing request
-        request = create_request(action, value, x, y, windspeed, windmill)
+        request = create_request(action, value, x, y, vx, vy, vz, windspeed, windmill)
         start_connection(host, port, request)
 
         try:
