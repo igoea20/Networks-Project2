@@ -4,8 +4,10 @@ import json
 import io
 import struct
 
-
 class Message:
+    #starts the value for status
+    status = "ON"
+
     def __init__(self, selector, sock, addr, request):
         self.selector = selector
         self.sock = sock
@@ -86,6 +88,14 @@ class Message:
         result = content.get("result")
         #print(f"got result: {result}")
         print(f"From Server: {result}")
+
+        if result == "SHUTDOWN: windspeed too high.":
+            Message.status = "OFF"
+        elif result == "STARTUP: Windspeed OK.":
+            Message.status = "ON"
+        
+        print("Windmill status: ")
+        print(Message.status)
 
 
     #calls either read or write depending on the state

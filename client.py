@@ -20,18 +20,18 @@ sel = selectors.DefaultSelector()
 #python client.py 127.0.0.1 65432 [store or status] [value] [x] [y] [vx] [vy] [vz] [windspeed] [windmill number]
 #input should be: host, socket, request, windspeed, windmill
 
-def create_request(action, value, x, y, vx, vy, vz, windspeed, windmill):
+def create_request(action, value, x, y, vx, vy, vz, windspeed, windmill, status):
     #we are assuming only json text is being sent
     return dict(
             type="text/json",
             encoding="utf-8",
-            content=dict(action=action, value=value,x=x, y=y, vx=vx, vy=vy, vz=vz, windspeed=windspeed, windmill=windmill),
+            content=dict(action=action, value=value,x=x, y=y, vx=vx, vy=vy, vz=vz, windspeed=windspeed, windmill=windmill, status=status),
         )
 
 
 def start_connection(host, port, request):
     addr = (host, port)
-    print("starting connection to", addr)
+    print("\nstarting connection to", addr)
     #tcp socket created for the server connection
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #set to non blocking
@@ -50,14 +50,16 @@ if len(sys.argv) != 12: #these are read from the command line
 
 host, port = sys.argv[1], int(sys.argv[2])
 action, value, x, y, vx, vy, vz, windspeed, windmill = sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8], sys.argv[9], int(sys.argv[10]), sys.argv[11]
-
+#libraryinstance = Message()
 #get the client to repeatedly connect to the server
 try:
     #for x in range(5):
     while True:
         time.sleep(3)
         #dictionary created representing request
-        request = create_request(action, value, x, y, vx, vy, vz, windspeed, windmill)
+        #status = libraryinstance.status
+        status = libclient.Message.status
+        request = create_request(action, value, x, y, vx, vy, vz, windspeed, windmill, status)
         start_connection(host, port, request)
         try:
             while True:
@@ -80,6 +82,13 @@ try:
         except KeyboardInterrupt:
             print("caught keyboard interrupt, exiting")
 
+        #prints status
+        #print(libclient.status)
+
+        #prints the current status of the Windmill
+        #print("Windmill status: ")
+        #print(status)
+
         #swaps the value for action
         if action == "status":
             action = "store"
@@ -87,7 +96,7 @@ try:
             action = "status"
 
             #simulates random wind speeds, only do it when status changes
-            randomnumber = random.randint(-2, 3)
+            randomnumber = random.randint(-2, 2)
             windspeed = windspeed + randomnumber
             
 

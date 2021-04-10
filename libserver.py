@@ -117,6 +117,7 @@ class Message:
             query6 = self.request.get("vy")
             query7 = self.request.get("vz")
             query2 = self.request.get("windspeed") #takes the value passed and saves it
+            query8 = self.request.get("status")
             #maxspeed = int( query2)
             maxspeed = query2
             query3 = self.request.get("windmill") #takes the value passed and saves it
@@ -130,12 +131,14 @@ class Message:
             # #content = {"result": answer}
             # content = {"result": f'Windmill {query3}: The XYZ coordinates are X{query} Y{query1}.Windspeed: {query2} km/h. {query4} Update turbine bearing: X vector: {query5} Y vector: {query6} Status: {answer}'}
             answer = request_search.get(val) or f'No match for "{query}".'
-            if maxspeed > 45:
+            if query8 == "OFF" and maxspeed <= 45:
+                content = {"result": f"STARTUP: Windspeed OK."}
+            elif maxspeed > 45:
                 query4 = "SHUTDOWN: windspeed too high."
                 content = {"result": f"SHUTDOWN: windspeed too high."}
             else:
                 query4 = "Windspeed OK."
-                content = {"result": f'Windmill {query3} status update:\n The XYZ coordinates are X{query} Y{query1}.Windspeed: {query2} km/h. {query4} Update turbine bearing: X vector: {query5} Y vector: {query6} Status: {answer}'}
+                content = {"result": f'Windmill {query3} status update:\nThe XYZ coordinates are X{query} Y{query1}.\nWindspeed: {query2} km/h. {query4} \nUpdate turbine bearing: X vector: {query5} Y vector: {query6} Status: {answer}'}
         else:
             content = {"result": f'Error: invalid action "{action}".'}
         content_encoding = "utf-8"
