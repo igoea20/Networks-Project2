@@ -84,7 +84,8 @@ class Message:
     def _process_response_json_content(self):
         content = self.response
         result = content.get("result")
-        print(f"got result: {result}")
+        #print(f"got result: {result}")
+        print(f"From Server: {result}")
 
 
     #calls either read or write depending on the state

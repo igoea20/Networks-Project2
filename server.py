@@ -31,8 +31,6 @@ if len(sys.argv) != 3:
     print("usage:", sys.argv[0], "<host> <port>")
     sys.exit(1)
 
-#this delay simulates the data arriving to the server (ground to satellite to server)
-time.sleep(0.56)
 #read from command line, use empty string for host to listen on all interfaces
 host, port = sys.argv[1], int(sys.argv[2])
 #creates a tcp socket

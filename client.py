@@ -9,11 +9,14 @@ import time
 #import the client message class
 import libclient
 
+#to simulate random wind conditions
+import random
+
 sel = selectors.DefaultSelector()
 
 #to start client type python client.py 127.0.0.1 65432 store 30 3
 
-#python client.py 127.0.0.1 65432 store 30 1 1 3 3 3 30 117
+#python client.py 127.0.0.1 65432 store 30 1 1 3 3 3 40 117
 #python client.py 127.0.0.1 65432 [store or status] [value] [x] [y] [vx] [vy] [vz] [windspeed] [windmill number]
 #input should be: host, socket, request, windspeed, windmill
 
@@ -46,17 +49,16 @@ if len(sys.argv) != 12: #these are read from the command line
     sys.exit(1)
 
 host, port = sys.argv[1], int(sys.argv[2])
-action, value, x, y, vx, vy, vz, windspeed, windmill = sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8], sys.argv[9], sys.argv[10], sys.argv[11]
+action, value, x, y, vx, vy, vz, windspeed, windmill = sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8], sys.argv[9], int(sys.argv[10]), sys.argv[11]
 
 #get the client to repeatedly connect to the server
 try:
     #for x in range(5):
     while True:
-        time.sleep(10)
+        time.sleep(3)
         #dictionary created representing request
         request = create_request(action, value, x, y, vx, vy, vz, windspeed, windmill)
         start_connection(host, port, request)
-
         try:
             while True:
                 events = sel.select(timeout=1)
@@ -83,6 +85,10 @@ try:
             action = "store"
         else:
             action = "status"
+
+            #simulates random wind speeds, only do it when status changes
+            randomnumber = random.randint(-2, 3)
+            windspeed = windspeed + randomnumber
             
 
 finally:
