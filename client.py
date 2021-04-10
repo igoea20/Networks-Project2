@@ -12,6 +12,9 @@ import libclient
 sel = selectors.DefaultSelector()
 
 #to start client type python client.py 127.0.0.1 65432 store 30 3
+
+#python client.py 127.0.0.1 65432 store 30 1 1 3 3 3 30 117
+#python client.py 127.0.0.1 65432 [store or status] [value] [x] [y] [vx] [vy] [vz] [windspeed] [windmill number]
 #input should be: host, socket, request, windspeed, windmill
 
 def create_request(action, value, x, y, vx, vy, vz, windspeed, windmill):
@@ -74,6 +77,13 @@ try:
                     break
         except KeyboardInterrupt:
             print("caught keyboard interrupt, exiting")
+
+        #swaps the value for action
+        if action == "status":
+            action = "store"
+        else:
+            action = "status"
+            
 
 finally:
     sel.close()
