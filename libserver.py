@@ -7,9 +7,9 @@ import struct
 #for delay simulation
 import time
 
-request_search = {
-    "morpheus": "Follow the white rabbit. \U0001f430",
-}
+#request_search = {
+#    "morpheus": "Follow the white rabbit. \U0001f430",
+#}
 
 #the methods in this class appear in the order in which processing
 #takes place for a message
@@ -110,7 +110,7 @@ class Message:
             content = {"result": f'Stored data "{store_speed}". {query4}.'}
             self.windmillArray[current] = store_speed #gets the speed and updates the array with it at this point
         elif action == "status":
-            val = self.request.get("value") #takes the value passed and saves it
+        #    val = self.request.get("value") #takes the value passed and saves it
             query = self.request.get("x") #takes the value passed and saves it
             query1 = self.request.get("y") #takes the value passed and saves it
             query5 = self.request.get("vx")
@@ -130,7 +130,7 @@ class Message:
             # answer = request_search.get(val) or f'No match for "{query}".'
             # #content = {"result": answer}
             # content = {"result": f'Windmill {query3}: The XYZ coordinates are X{query} Y{query1}.Windspeed: {query2} km/h. {query4} Update turbine bearing: X vector: {query5} Y vector: {query6} Status: {answer}'}
-            answer = request_search.get(val) or f'No match for "{query}".'
+        #    answer = request_search.get(val) or f'No match for "{query}".'
             if query8 == "OFF" and maxspeed <= 45:
                 content = {"result": f"STARTUP: Windspeed OK."}
             elif maxspeed > 45:
@@ -138,7 +138,7 @@ class Message:
                 content = {"result": f"SHUTDOWN: windspeed too high."}
             else:
                 query4 = "Windspeed OK."
-                content = {"result": f'Windmill {query3} status update:\nThe XYZ coordinates are X{query} Y{query1}.\nWindspeed: {query2} km/h. {query4} \nUpdate turbine bearing: X vector: {query5} Y vector: {query6} Status: {answer}'}
+                content = {"result": f'Windmill {query3} status update:\nThe XYZ coordinates are X{query} Y{query1}.\nWindspeed: {query2} km/h. {query4} \nUpdate turbine bearing: X vector: {query5} Y vector: {query6} '}
         else:
             content = {"result": f'Error: invalid action "{action}".'}
         content_encoding = "utf-8"
