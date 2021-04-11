@@ -16,16 +16,16 @@ sel = selectors.DefaultSelector()
 
 #to start client type python client.py 127.0.0.1 65432 store 30 3
 
-#python client.py 127.0.0.1 65432 store 30 1 1 3 3 3 40 117
-#python client.py 127.0.0.1 65432 [store or status] [value] [x] [y] [vx] [vy] [vz] [windspeed] [windmill number]
+#python client.py 127.0.0.1 65432 store 1 1 3 3 3 40 117
+#python client.py 127.0.0.1 65432 [store or status] [x] [y] [vx] [vy] [vz] [windspeed] [windmill number]
 #input should be: host, socket, request, windspeed, windmill
 
-def create_request(action, value, x, y, vx, vy, vz, windspeed, windmill, status):
+def create_request(action, x, y, vx, vy, vz, windspeed, windmill, status):
     #we are assuming only json text is being sent
     return dict(
             type="text/json",
             encoding="utf-8",
-            content=dict(action=action, value=value,x=x, y=y, vx=vx, vy=vy, vz=vz, windspeed=windspeed, windmill=windmill, status=status),
+            content=dict(action=action, x=x, y=y, vx=vx, vy=vy, vz=vz, windspeed=windspeed, windmill=windmill, status=status),
         )
 
 
@@ -44,12 +44,12 @@ def start_connection(host, port, request):
     #message object is associated with the socket
     sel.register(sock, events, data=message)
 
-if len(sys.argv) != 12: #these are read from the command line
-    print("usage:", sys.argv[0], "<host> <port> <action> <value> <x> <y> <vx> <vy> <vz>  <windspeed> <windmill>")
+if len(sys.argv) != 11: #these are read from the command line
+    print("usage:", sys.argv[0], "<host> <port> <action> <x> <y> <vx> <vy> <vz>  <windspeed> <windmill>")
     sys.exit(1)
 
 host, port = sys.argv[1], int(sys.argv[2])
-action, value, x, y, vx, vy, vz, windspeed, windmill = sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8], sys.argv[9], int(sys.argv[10]), sys.argv[11]
+action,x, y, vx, vy, vz, windspeed, windmill = sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8], int(sys.argv[9]), sys.argv[10]
 #libraryinstance = Message()
 #get the client to repeatedly connect to the server
 try:
@@ -59,7 +59,7 @@ try:
         #dictionary created representing request
         #status = libraryinstance.status
         status = libclient.Message.status
-        request = create_request(action, value, x, y, vx, vy, vz, windspeed, windmill, status)
+        request = create_request(action,x, y, vx, vy, vz, windspeed, windmill, status)
         start_connection(host, port, request)
         try:
             while True:
