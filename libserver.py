@@ -113,13 +113,14 @@ class Message:
         #    val = self.request.get("value") #takes the value passed and saves it
             query = self.request.get("x") #takes the value passed and saves it
             query1 = self.request.get("y") #takes the value passed and saves it
-            query5 = self.request.get("vx")
-            query6 = self.request.get("vy")
-            query7 = self.request.get("vz")
+            query5 = self.request.get("windangle")
+            query6 = self.request.get("turbineangle")
             query2 = self.request.get("windspeed") #takes the value passed and saves it
             query8 = self.request.get("status")
-            #maxspeed = int( query2)
-            maxspeed = query2
+            maxspeed =  query2
+            wangle = query5
+            tangle = query6
+            #maxspeed = query2
             query3 = self.request.get("windmill") #takes the value passed and saves it
             # if maxspeed > 45:
             #     query4 = "SHUTDOWN: windspeed too high."
@@ -136,9 +137,13 @@ class Message:
             elif maxspeed > 45:
                 query4 = "SHUTDOWN: windspeed too high."
                 content = {"result": f"SHUTDOWN: windspeed too high."}
+            elif abs(wangle-tangle) > 1:
+                query4 = "Windspeed OK."
+                query6 = query5
+                content = {"result": f'Windmill {query3} status update:\nThe XYZ coordinates are X{query} Y{query1}.\nWindspeed: {query2} km/h. {query4} \nUpdate turbine bearing to: {query5} degrees'}
             else:
                 query4 = "Windspeed OK."
-                content = {"result": f'Windmill {query3} status update:\nThe XYZ coordinates are X{query} Y{query1}.\nWindspeed: {query2} km/h. {query4} \nUpdate turbine bearing: X vector: {query5} Y vector: {query6} '}
+                content = {"result": f'Windmill {query3} status update:\nThe XYZ coordinates are X{query} Y{query1}.\nWindspeed: {query2} km/h. {query4} \n '}
         else:
             content = {"result": f'Error: invalid action "{action}".'}
         content_encoding = "utf-8"
