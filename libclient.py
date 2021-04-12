@@ -7,6 +7,8 @@ import struct
 class Message:
     #starts the value for status
     status = "ON"
+    Cwindangle = 0
+    Cturbineangle = 0
 
     def __init__(self, selector, sock, addr, request):
         self.selector = selector
@@ -93,6 +95,10 @@ class Message:
             Message.status = "OFF"
         elif result == "STARTUP: Windspeed OK.":
             Message.status = "ON"
+        elif result == "Update turbine bearing to wind direction.":
+            temp = Message.Cturbineangle
+            Message.Cturbineangle = Message.Cwindangle
+            print(f"Updated turbine bearing from {temp} to {Message.Cturbineangle}")
         
         print("Windmill status: ")
         print(Message.status)

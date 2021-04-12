@@ -140,7 +140,8 @@ class Message:
             elif abs(wangle-tangle) > 1:
                 query4 = "Windspeed OK."
                 query6 = query5
-                content = {"result": f'Windmill {query3} status update:\nThe XYZ coordinates are X{query} Y{query1}.\nWindspeed: {query2} km/h. {query4} \nUpdate turbine bearing to: {query5} degrees'}
+                #content = {"result": f'Windmill {query3} status update:\nThe XYZ coordinates are X{query} Y{query1}.\nWindspeed: {query2} km/h. {query4} \nUpdate turbine bearing to: {query5} degrees'}
+                content = {"result": f"Update turbine bearing to wind direction."}
             else:
                 query4 = "Windspeed OK."
                 content = {"result": f'Windmill {query3} status update:\nThe XYZ coordinates are X{query} Y{query1}.\nWindspeed: {query2} km/h. {query4} \n '}

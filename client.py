@@ -16,8 +16,8 @@ sel = selectors.DefaultSelector()
 
 #to start client type python client.py 127.0.0.1 65432 store 30 3
 
-#python client.py 127.0.0.1 65432 store 1 1 3 3 3 40 117
-#python client.py 127.0.0.1 65432 [store or status] [x] [y] [vx] [vy] [vz] [windspeed] [windmill number]
+#python client.py 127.0.0.1 65432 store 1 1 30 50 40 117
+#python client.py 127.0.0.1 65432 [store or status] [x] [y] [windangle] [turbine angle]] [windspeed] [windmill number]
 #input should be: host, socket, request, windspeed, windmill
 
 def create_request(action, x, y, windangle, turbineangle, windspeed, windmill, status):
@@ -52,6 +52,9 @@ host, port = sys.argv[1], int(sys.argv[2])
 action,x, y, windangle, turbineangle, windspeed, windmill = sys.argv[3], sys.argv[4], sys.argv[5], int(sys.argv[6]), int(sys.argv[7]), int(sys.argv[8]), sys.argv[9]
 #libraryinstance = Message()
 #get the client to repeatedly connect to the server
+libclient.Message.Cwindangle = windangle
+libclient.Message.Cturbineangle = turbineangle
+
 try:
     #for x in range(5):
     while True:
@@ -59,6 +62,10 @@ try:
         #dictionary created representing request
         #status = libraryinstance.status
         status = libclient.Message.status
+        print(libclient.Message.Cwindangle)
+        print(libclient.Message.Cturbineangle)
+        windangle = libclient.Message.Cwindangle
+        turbineangle = libclient.Message.Cturbineangle
         request = create_request(action,x, y, windangle, turbineangle, windspeed, windmill, status)
         start_connection(host, port, request)
         try:
@@ -99,7 +106,7 @@ try:
             randomnumber = random.randint(-2, 2)
             randomnumber1 = random.randint(-1, 1)
             windspeed = windspeed + randomnumber
-            windangle = windangle +randomnumber1
+            libclient.Message.Cwindangle = libclient.Message.Cwindangle + randomnumber1
             if abs(windangle-turbineangle) > 1:
                 turbineangle = windangle 
             
