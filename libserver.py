@@ -7,15 +7,10 @@ import struct
 #for delay simulation
 import time
 
-#request_search = {
-#    "morpheus": "Follow the white rabbit. \U0001f430",
-#}
 
-#the methods in this class appear in the order in which processing
-#takes place for a message
 
 class Message:
-    #constructor
+    #constructor for the server message class
     def __init__(self, selector, sock, addr, windmillArray):
         self.selector = selector
         self.sock = sock
@@ -28,6 +23,7 @@ class Message:
         self.response_created = False
         self.windmillArray = windmillArray  #this is the windmill array
 
+    #decides whether to read, write, or read and write
     def _set_selector_events_mask(self, mode):
         """Set selector to listen for events: mode is 'r', 'w', or 'rw'."""
         if mode == "r":
@@ -55,8 +51,7 @@ class Message:
 
     def _write(self):
         if self._send_buffer:
-
-        #    print("sending", repr(self._send_buffer), "to", self.addr)
+            #if there is something in the send buffer, try writing it to the client
             try:
                 # Should be ready to write
                 sent = self.sock.send(self._send_buffer)
@@ -65,7 +60,7 @@ class Message:
                 pass
             else:
                 self._send_buffer = self._send_buffer[sent:]
-                # Close when the buffer is drained. The response has been sent.
+                # Close when the buffer is empty. The response has been sent.
                 if sent and not self._send_buffer:
                     self.close()
 
@@ -81,6 +76,7 @@ class Message:
         tiow.close()
         return obj
 
+    #creates a json message with a header and headerlength
     def _create_message(
         self, *, content_bytes, content_type, content_encoding
     ):
@@ -96,51 +92,41 @@ class Message:
         return message
 
     def _create_response_json_content(self): #creates the response for the client
-
         action = self.request.get("action")
 
         if action == "store":
             current = self.request.get("windmill")
             store_speed = self.request.get("windspeed")
             maxspeed = int(store_speed)
+            #if the clients windspeed is greater than 45 tell it to shutdown
             if maxspeed > 45:
                 query4 = "SHUTDOWN: windspeed too high."
             else:
                 query4 = "Windspeed OK."
             content = {"result": f'Stored data "{store_speed}". {query4}.'}
-            self.windmillArray[current] = store_speed #gets the speed and updates the array with it at this point
+            self.windmillArray[current] = store_speed #gets the speed and updates the array with it
+
         elif action == "status":
-        #    val = self.request.get("value") #takes the value passed and saves it
             query = self.request.get("x") #takes the value passed and saves it
-            query1 = self.request.get("y") #takes the value passed and saves it
+            query1 = self.request.get("y")
             query5 = self.request.get("windangle")
             query6 = self.request.get("turbineangle")
-            query2 = self.request.get("windspeed") #takes the value passed and saves it
+            query2 = self.request.get("windspeed")
             query8 = self.request.get("status")
             maxspeed =  query2
             wangle = query5
             tangle = query6
-            #maxspeed = query2
             query3 = self.request.get("windmill") #takes the value passed and saves it
-            # if maxspeed > 45:
-            #     query4 = "SHUTDOWN: windspeed too high."
-            # else:
-            #     query4 = "Windspeed OK."
 
-            # #content = {"result": f'The XYZ coordinates are X{query} Y{query1} Z{query2}. The temperature is {query3}'}
-            # answer = request_search.get(val) or f'No match for "{query}".'
-            # #content = {"result": answer}
-            # content = {"result": f'Windmill {query3}: The XYZ coordinates are X{query} Y{query1}.Windspeed: {query2} km/h. {query4} Update turbine bearing: X vector: {query5} Y vector: {query6} Status: {answer}'}
-        #    answer = request_search.get(val) or f'No match for "{query}".'
-            if query8 == "OFF" and maxspeed <= 45:
+            if query8 == "OFF" and maxspeed <= 45:  #if client is off but the speed is ok, tell it to start up again
                 content = {"result": f"STARTUP: Windspeed OK."}
             elif maxspeed > 45:
                 query4 = "SHUTDOWN: windspeed too high."
                 content = {"result": f"SHUTDOWN: windspeed too high."}
-            elif abs(wangle-tangle) > 1:
+
+            elif abs(wangle-tangle) > 1:    #if the angle difference is too big, tell the turbine to change angle
                 query4 = "Windspeed OK."
                 query6 = query5
-                #content = {"result": f'Windmill {query3} status update:\nThe XYZ coordinates are X{query} Y{query1}.\nWindspeed: {query2} km/h. {query4} \nUpdate turbine bearing to: {query5} degrees'}
                 content = {"result": f"Update turbine bearing to wind direction."}
             else:
                 query4 = "Windspeed OK."
@@ -156,7 +142,7 @@ class Message:
         return response
 
 
-    #called in app-server when events are ready
+    #called in server.py when events are ready
     #either reads or writes the message
     def process_events(self, mask):
         if mask & selectors.EVENT_READ:

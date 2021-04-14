@@ -1,6 +1,6 @@
-#Project 1: Aoife Igoe and Evan Mitchell
+#Project 2: Aoife Igoe, Doan Khuc, Evan Mitchell, Lochlann Hackett
 
-Software Required: We wrote and compiled our code using Python3 on a Windows10 machine. The latest version can be downloaded here "https://www.python.org/downloads/". 
+Software Required: We wrote and compiled our code using Python3 on a Windows10 machine. The latest version can be downloaded here "https://www.python.org/downloads/".
         Once downloaded it must be added as a path variable. Instructions on how to do this can be found here "https://geek-university.com/python/add-python-to-the-windows-path/".
 
 1. Set up two Command Prompts and navigate to the folder containing the 4 code files in each of the CPs.

@@ -10,6 +10,7 @@ class Message:
     Cwindangle = 0
     Cturbineangle = 0
 
+    #function setting the values of the Message
     def __init__(self, selector, sock, addr, request):
         self.selector = selector
         self.sock = sock
@@ -22,6 +23,7 @@ class Message:
         self.jsonheader = None
         self.response = None
 
+    #determines whether it is a read, write, or read and write event
     def _set_selector_events_mask(self, mode):
         """Set selector to listen for events: mode is 'r', 'w', or 'rw'."""
         if mode == "r":
@@ -48,9 +50,10 @@ class Message:
             else:
                 raise RuntimeError("Peer closed.")
 
+
     def _write(self):
         if self._send_buffer:
-            #print("sending", repr(self._send_buffer), "to", self.addr)
+            #there is something waiting in the send buffer
             try:
                 #Should be ready to write
                 sent = self.sock.send(self._send_buffer)
@@ -58,7 +61,9 @@ class Message:
                 #Resource temporarily unavailable (errno EWOULDBLOCK)
                 pass
             else:
+                #remove what has just been sent from the buffer
                 self._send_buffer = self._send_buffer[sent:]
+
 
     def _json_encode(self, obj, encoding):
         return json.dumps(obj, ensure_ascii=False).encode(encoding)
@@ -71,6 +76,7 @@ class Message:
         tiow.close()
         return obj
 
+    #this creates the message, combining the actual content with the header required, and encoding it correctly
     def _create_message(
         self, *, content_bytes, content_type, content_encoding
     ):
@@ -85,10 +91,10 @@ class Message:
         message = message_hdr + jsonheader_bytes + content_bytes
         return message
 
+    #reads in the response from the 'status' request and updates the turbines values
     def _process_response_json_content(self):
         content = self.response
         result = content.get("result")
-        #print(f"got result: {result}")
         print(f"From Server: {result}")
 
         if result == "SHUTDOWN: windspeed too high.":
@@ -99,7 +105,7 @@ class Message:
             temp = Message.Cturbineangle
             Message.Cturbineangle = Message.Cwindangle
             print(f"Updated turbine bearing from {temp} to {Message.Cturbineangle}")
-        
+
         print("Windmill status: ")
         print(Message.status)
 
@@ -111,7 +117,7 @@ class Message:
         if mask & selectors.EVENT_WRITE:
             self.write()
 
-    #same as the server version
+    #seperates up the response so the header length, header, and body can be processed
     def read(self):
         self._read()
 
@@ -141,17 +147,19 @@ class Message:
                 #Set selector to listen for read events, we're done writing.
                 self._set_selector_events_mask("r")
 
+
     def close(self):
         print("closing connection to", self.addr)
         try:
+            #unregister the socket from the server
             self.selector.unregister(self.sock)
         except Exception as e:
             print(
                 "error: selector.unregister() exception for",
                 f"{self.addr}: {repr(e)}",
             )
-
         try:
+            #close the socket
             self.sock.close()
         except OSError as e:
             print(
@@ -159,10 +167,10 @@ class Message:
                 f"{self.addr}: {repr(e)}",
             )
         finally:
-            # Delete reference to socket object for garbage collection
+            # Delete reference to socket object
             self.sock = None
 
-
+    #encode a request and add it to the send buffer
     def queue_request(self):
         content = self.request["content"]
         content_type = self.request["type"]
@@ -180,10 +188,12 @@ class Message:
 
     def process_protoheader(self):
         hdrlen = 2
+        #if it contains more than just the headerlength only look at the header bit
         if len(self._recv_buffer) >= hdrlen:
             self._jsonheader_len = struct.unpack(
                 ">H", self._recv_buffer[:hdrlen]
             )[0]
+            #leave the rest of the response in the buffer (minus headerlength)
             self._recv_buffer = self._recv_buffer[hdrlen:]
 
     def process_jsonheader(self):
@@ -210,7 +220,6 @@ class Message:
         self._recv_buffer = self._recv_buffer[content_len:]
         encoding = self.jsonheader["content-encoding"]
         self.response = self._json_decode(data, encoding)
-        #print("received response", repr(self.response), "from", self.addr)
         self._process_response_json_content()
         # Close when response has been processed
         self.close()

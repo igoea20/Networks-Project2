@@ -4,16 +4,15 @@ import socket
 import selectors
 import traceback
 
-#used for simulating time delay for satellites
+#used for simulating time delay
 import time
-#this contains the server message class
 import libserver
 
 sel = selectors.DefaultSelector()
 
 
 
-#to start for me it was python server.py "" 65432
+#to start: python server.py "" 65432
 
 #when a client connection is accepted, a message object is created (socket is ready to read)
 def accept_wrapper(sock, windmillArray):
@@ -41,7 +40,8 @@ lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 lsock.bind((host, port))
 lsock.listen()
 print("listening on", (host, port))
-windmillArray = dict([('1', 0), ('2', 0), ('3', 0), ('4', 0), ('5', 0)])    #initialising all speeds to 0
+#makes an array to hold the turbines wind speeds, initialising them all to 0
+windmillArray = dict([('1', 0), ('2', 0), ('3', 0), ('4', 0), ('5', 0)])
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
 
